@@ -222,7 +222,7 @@ data=rag_retriever.retrieve("What year did the candidate completed his B. Tech C
 print("data",data)
 
 class GroqLLM:
-    def __init__(self, model_name: str = "gemma2-9b-it", api_key: str =None):
+    def __init__(self, model_name: str = "llama-3.1-8b-instant", api_key: str =None):
         """
         Initialize Groq LLM
         
@@ -316,7 +316,7 @@ except ValueError as e:
     print("Please set your GROQ_API_KEY environment variable to use the LLM.")
     groq_llm = None
 
-rag_retriever.retrieve("What technical skills candidate has?")
+rag_retriever.retrieve("what is the overall experience of candidate?")
 
 
 
@@ -334,7 +334,7 @@ def ask_llm(prompt: str) -> str:
                 "content": prompt
             }
         ],
-        model="gemma2-9b-it",
+        model="llama-3.1-8b-instant",
     )
     print("cccc",chat_completion)
     return chat_completion.choices[0].message.content
@@ -362,5 +362,5 @@ Answer:"""
     return ask_llm(prompt)
 
 
-answer = rag_simple("What technical skills does the candidate have?", rag_retriever)
+answer = rag_simple("What is the professional experience of the candidate?", rag_retriever)
 print(answer)
