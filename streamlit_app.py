@@ -4,7 +4,7 @@ from app import rag_simple, rag_retriever
 
 st.set_page_config(page_title="RAG Chatbot", page_icon="💬", layout="wide")
 
-st.title("💬 RAG PDF Chatbot")
+st.title("💬PDF Chatbot")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
