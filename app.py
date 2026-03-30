@@ -66,7 +66,7 @@ chunks=split_documents(all_pdf_documents)
 
 class EmbeddingManager:
     
-    def __init__(self, model_name: str = r"C:\models\all-MiniLM-L6-v2"):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         self.model_name = model_name
         self.model = None
         self._load_model()
@@ -183,7 +183,7 @@ class RAGRetriever:
                 query_embeddings=[query_embedding.tolist()],
                 n_results=top_k
             )
-            # print(results)
+            print("RES",results)
 
             
             # Process results
@@ -222,7 +222,7 @@ data=rag_retriever.retrieve("What year did the candidate completed his B. Tech C
 print("data",data)
 
 class GroqLLM:
-    def __init__(self, model_name: str = "gemma2-9b-it", api_key: str =None):
+    def __init__(self, model_name: str = "llama-3.1-8b-instant", api_key: str =None):
         """
         Initialize Groq LLM
         
@@ -262,13 +262,10 @@ class GroqLLM:
         prompt_template = PromptTemplate(
             input_variables=["context", "question"],
             template="""You are a helpful AI assistant. Use the following context to answer the question accurately and concisely.
-
-Context:
-{context}
-
-Question: {question}
-
-Answer: Provide a clear and informative answer based on the context above. If the context doesn't contain enough information to answer the question, say so."""
+            Context:
+            {context}
+            Question: {question}
+            Answer: Provide a clear and informative answer based on the context above. If the context doesn't contain enough information to answer the question, say so."""
         )
         
         # Format the prompt
@@ -296,9 +293,9 @@ Answer: Provide a clear and informative answer based on the context above. If th
         """
         simple_prompt = f"""Based on this context: {context}
 
-Question: {query}
+        Question: {query}
 
-Answer:"""
+        Answer:"""
         
         try:
             messages = [HumanMessage(content=simple_prompt)]
@@ -308,15 +305,15 @@ Answer:"""
             return f"Error: {str(e)}"
 
 # Initialize Groq LLM (you'll need to set GROQ_API_KEY environment variable)
-try:
-    groq_llm = GroqLLM(api_key=os.getenv("GROQ_API_KEY"))
-    print("Groq LLM initialized successfully!")
-except ValueError as e:
-    print(f"Warning: {e}")
-    print("Please set your GROQ_API_KEY environment variable to use the LLM.")
-    groq_llm = None
+# try:
+#     groq_llm = GroqLLM(api_key=os.getenv("GROQ_API_KEY"))
+#     print("Groq LLM initialized successfully!")
+# except ValueError as e:
+#     print(f"Warning: {e}")
+#     print("Please set your GROQ_API_KEY environment variable to use the LLM.")
+#     groq_llm = None
 
-rag_retriever.retrieve("What technical skills candidate has?")
+# rag_retriever.retrieve("what is the overall experience of candidate?")
 
 
 
@@ -334,7 +331,7 @@ def ask_llm(prompt: str) -> str:
                 "content": prompt
             }
         ],
-        model="gemma2-9b-it",
+        model="llama-3.1-8b-instant",
     )
     print("cccc",chat_completion)
     return chat_completion.choices[0].message.content
@@ -350,17 +347,30 @@ def rag_simple(query, retriever, top_k=3):
     if not context:
         return "No relevant context found to answer the question"
 
-    prompt = f"""Use the following context to answer the question concisely.
+    prompt = f"""
+
+You are a helpful AI assistant.
+
+Use the provided context to answer the question.
+
+Guidelines:
+- Prefer using the context
+- Give exact answers when possible
+- If multiple answers exist, choose the most relevant
+- Avoid making up information
+- Keep answers clear and concise
 
 Context:
 {context}
 
-Question: {query}
+Question:
+{query}
 
-Answer:"""
+Answer:
+"""
 
     return ask_llm(prompt)
 
 
-answer = rag_simple("What technical skills does the candidate have?", rag_retriever)
+answer = rag_simple("When does candidate completed his B.Tech?", rag_retriever)
 print(answer)
