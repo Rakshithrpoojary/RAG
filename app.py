@@ -1,6 +1,7 @@
 import os
 from langchain_community.document_loaders import PyPDFLoader, PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_core.messages import SystemMessage,HumanMessage
 from pathlib import Path
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -320,17 +321,24 @@ class GroqLLM:
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 def ask_llm(prompt: str) -> str:
+    system = SystemMessage(
+        content="You are a helpful assistant."
+    )
+    human = HumanMessage(
+        content=prompt
+    )
     chat_completion = client.chat.completions.create(
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful assistant."
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
+        messages=[system,human],
+        # messages=[
+        #     {
+        #         "role": "system",
+        #         "content": "You are a helpful assistant."
+        #     },
+        #     {
+        #         "role": "user",
+        #         "content": prompt
+        #     }
+        # ],
         model="llama-3.1-8b-instant",
     )
     print("cccc",chat_completion)
